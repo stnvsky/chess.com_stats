@@ -13,6 +13,7 @@ moves = [0, 0]
 month_time_seconds = 0
 total_time_seconds = 0
 added_time = 0
+games_played = [0,0,0] # bullet, blitz, rapid
 
 dir_name = sys.argv[1]
 files = os.listdir(dir_name)
@@ -22,12 +23,20 @@ for file_name in files:
       for line in f:
          if (line.find('TimeControl') != -1):
             time_control_str = line.split("\"")[1]
-            if (time_control_str.find('+') != -1):
+            if (time_control_str.find('1/') != -1):
+               time_control = -1
+            elif (time_control_str.find('+') != -1):
                time_control = int(time_control_str.split('+')[0])
-               added_time = int(time_control_str.split('+')[1])
             else:
                time_control = int(time_control_str)
-               added_time = 0
+         
+            if (time_control > 0):
+               if (time_control < 180):
+                  games_played[0] += 1
+               elif (time_control < 600):
+                  games_played[1] += 1
+               else:
+                  games_played[2] += 1
 
          if (line[0] == '1'):
             times = line.split("]}")
@@ -51,4 +60,8 @@ for file_name in files:
    total_time_seconds += month_time_seconds
    month_time_seconds = 0
 
+print("\nGames played: " + str(sum(games_played)))
+print("\nBullet: " + str(games_played[0]))
+print("Blitz: " + str(games_played[1]))
+print("Rapid: " + str(games_played[2]))
 print("\nTotal time: " + str(datetime.timedelta(seconds=total_time_seconds)).split('.')[0])
